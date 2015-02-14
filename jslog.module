@@ -1,0 +1,9 @@
+<?php
+
+function jslog_menu() {
+
+}
+
+function jslog_init() {
+
+}
