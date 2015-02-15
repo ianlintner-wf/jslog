@@ -20,13 +20,16 @@ function jslog_menu() {
  * page_callback to be used ajax callback for jslog to send log messages.
  */
 function jslog_ajax_log() {
-  $severity = $_POST['severity'];
-  $message = $_POST['message'];
-  $excepton = $_POST['exception'];
-  $data = $_POST['data'];
+  $jslog_enabled = variable_get('jslog_enabled', TRUE);
+  if($jslog_enabled) {
+    $severity = $_POST['severity'];
+    $message = $_POST['message'];
+    $excepton = $_POST['exception'];
+    $data = $_POST['data'];
 
-  if(!empty($severity) && !empty($message)) {
-    watchdog('jslog', $message, null, $severity);
+    if (!empty($severity) && !empty($message)) {
+      watchdog('jslog', $message, NULL, $severity);
+    }
   }
 }
 
@@ -35,6 +38,10 @@ function jslog_ajax_log() {
  * @param $page
  */
 function jslog_page_build(&$page) {
-  drupal_add_js(drupal_get_path('module','jslog') . '/js/jslog.js');
+  //Include logger on every page
+  $jslog_enabled = variable_get('jslog_enabled', TRUE);
+  if($jslog_enabled) {
+    drupal_add_js(drupal_get_path('module', 'jslog') . '/js/jslog.js');
+  }
 }
 

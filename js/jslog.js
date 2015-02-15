@@ -1,25 +1,24 @@
-(function ($) {
-  window.onerror = function (message, filename, linenumber) {
-    if(Drupal.settings.jslog_handle_error) {
-      var jslog_callback = Drupal.settings.jslog_callback;
-      //async
-      $.ajax({
-        url : jslog_callback,
-        dataType : 'json',
-        async : true,
-        type : 'POST',
-        data : {severity : 4, message : message + ' ' + filename + ' ' + linenumber},
-        success : function (data) {
-          remoteData = data;
-        },
-        error : function () {
+var jslog = new Object();
+jslog.callback_path = '/ajax/json/jslog';
 
-        }
-      });
-      return true;
+jslog.log = function (message, severity, source) {
+  jQuery.ajax({
+    url : jslog.callback_path,
+    dataType : 'json',
+    async : true,
+    type : 'POST',
+    data : {severity : severity, message : message + ' ' + source},
+    success : function (data) {
+
+    },
+    error : function () {
+      console.log('jslog failed ajax logging call');
     }
-    else {
-      return false;
-    }
-  }
-})(jQuery);
+
+  });
+}
+
+window.onerror = function (message, filename, linenumber) {
+  jslog.log(message, 4, ' file: ' + filename + ' line number: ' + linenumber);
+  return true;
+}
