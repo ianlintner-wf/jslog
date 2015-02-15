@@ -1,17 +1,41 @@
 <?php
 
 /**
+ * Implements hook_permission().
+ */
+function jslog_permission() {
+  return array(
+    'administer jslog settings' => array(
+      'title' => t('Access/Edit jslog settings'),
+    )
+  );
+}
+
+/**
  * Implements hook_menu()
  * @return array
  */
 function jslog_menu() {
   $items = array();
+
+  $items['admin/config/jslog'] = array(
+    'title' => 'jslog module settings',
+    'description' => 'jslog module settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jslog_settings'),
+    'access arguments' => array('administer jslog settings'),
+    'file' => 'jslog.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['ajax/json/jslog'] = array (
     'title' => 'Ajax log',
     'page callback' => 'jslog_ajax_log',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK
   );
+
+
   return $items;
 }
 
@@ -21,6 +45,7 @@ function jslog_menu() {
  */
 function jslog_ajax_log() {
   $jslog_enabled = variable_get('jslog_enabled', TRUE);
+  $jslog_identity = variable_get('jslog_identity', 'jslog');
   if($jslog_enabled) {
     $severity = $_POST['severity'];
     $message = $_POST['message'];
@@ -28,7 +53,7 @@ function jslog_ajax_log() {
     $data = $_POST['data'];
 
     if (!empty($severity) && !empty($message)) {
-      watchdog('jslog', $message, NULL, $severity);
+      watchdog($jslog_identity, $message, NULL, $severity);
     }
   }
 }
