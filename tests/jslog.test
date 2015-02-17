@@ -1,0 +1,43 @@
+<?php
+// $Id$
+
+/**
+ * Unit tests for Revision Moderation module.
+ */
+class JSLogTest extends DrupalWebTestCase {
+  protected $privilegedUser;
+
+  /**
+   * Drupal SimpleTest method: return metadata about the test.
+   */
+  function get_info() {
+    return array(
+      'name'  => t('jslog'),
+      'desc'  => t('Executes test suite for jslog module.'),
+      'group' => t('development'),
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('JSLog Test');
+    $this->privilegedUser = $this->drupalCreateUser(array('administer jslog settings'));
+    $this->drupalLogin($this->privilegedUser);
+  }
+
+  public function testJSLogEnable() {
+
+  }
+
+
+  public function testJSLogDisable() {
+
+  }
+
+  public function testJSLogIdentitySet() {
+
+  }
+
+}
+
+
+?>

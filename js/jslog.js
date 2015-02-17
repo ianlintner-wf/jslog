@@ -14,8 +14,8 @@ jslog.log = function (message, severity, source) {
     error : function () {
       console.log('jslog failed ajax logging call');
     }
-
   });
+  return true;
 }
 
 window.onerror = function (message, filename, linenumber) {
