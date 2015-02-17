@@ -10,7 +10,7 @@ function jslog_settings() {
     '#description' => t("Removes jslog scripts and logging functions."),
   );
 
-  $form['jslog_identitye'] = array(
+  $form['jslog_identity'] = array(
     '#type' => 'textfield',
     '#title' => t('JSLog Watchdog Identity'),
     '#default_value' => variable_get('jslog_identity', 'jslog'),

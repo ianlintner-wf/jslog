@@ -19,13 +19,27 @@ class JSLogTest extends DrupalWebTestCase {
   }
 
   public function setUp() {
-    parent::setUp('JSLog Test');
+    parent::setUp('jslog');
     $this->privilegedUser = $this->drupalCreateUser(array('administer jslog settings'));
     $this->drupalLogin($this->privilegedUser);
   }
 
-  public function testJSLogEnable() {
+  public function testJSLogSettings() {
+    $this->drupalGet('admin/config/jslog');
+  }
 
+  public function testJSLogDisableEnable() {
+    $edit = array(
+      'logging_enabled' => true,
+    );
+    $this->drupalPost('admin/config/jslog', $edit, t('Save configuration'));
+    $this->assertEqual( variable_get('jslog_enabled'), false, 'jslog admin disabled.');
+
+    $edit = array(
+      'logging_enabled' => true,
+    );
+    $this->drupalPost('admin/config/jslog', $edit, t('Save configuration'));
+    $this->assertEqual( variable_get('jslog_enabled'), true, 'jslog admin enabled.');
   }
 
 
