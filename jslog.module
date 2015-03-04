@@ -13,32 +13,31 @@ function jslog_permission() {
 
 /**
  * Implements hook_menu()
+ *
  * @return array
  */
 function jslog_menu() {
   $items = array();
 
   $items['admin/config/jslog'] = array(
-    'title' => 'jslog module settings',
-    'description' => 'jslog module settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('jslog_settings'),
+    'title'            => 'jslog module settings',
+    'description'      => 'jslog module settings',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('jslog_settings'),
     'access arguments' => array('administer jslog settings'),
-    'file' => 'jslog.admin.inc',
-    'type' => MENU_NORMAL_ITEM,
+    'file'             => 'jslog.admin.inc',
+    'type'             => MENU_NORMAL_ITEM,
   );
 
-  $items['ajax/json/jslog'] = array (
-    'title' => 'Ajax log',
-    'page callback' => 'jslog_ajax_log',
+  $items['ajax/json/jslog'] = array(
+    'title'           => 'Ajax log',
+    'page callback'   => 'jslog_ajax_log',
     'access callback' => TRUE,
-    'type' => MENU_CALLBACK
+    'type'            => MENU_CALLBACK
   );
-
 
   return $items;
 }
-
 
 /**
  * page_callback to be used ajax callback for jslog to send log messages.
@@ -46,26 +45,36 @@ function jslog_menu() {
 function jslog_ajax_log() {
   $jslog_enabled = variable_get('jslog_enabled', TRUE);
   $jslog_identity = variable_get('jslog_identity', 'jslog');
-  if($jslog_enabled) {
+  if ($jslog_enabled) {
     $severity = $_POST['severity'];
     $message = $_POST['message'];
     $excepton = $_POST['exception'];
     $data = $_POST['data'];
-
+    $paramters = array();
     if (!empty($severity) && !empty($message)) {
-      watchdog($jslog_identity, $message, NULL, $severity);
+      if (isset($excepton)) {
+        $message .= ' exception: %exception';
+        $paramters['%exception'] = print_r($excepton, TRUE);
+      }
+      if (isset($data)) {
+        $message .= ' data: %data';
+        $paramters['%data'] = print_r($data, TRUE);
+      }
+      watchdog($jslog_identity, $message, $paramters, $severity);
+
     }
   }
 }
 
 /**
  * Implements hook_page_build
+ *
  * @param $page
  */
 function jslog_page_build(&$page) {
   //Include logger on every page
   $jslog_enabled = variable_get('jslog_enabled', TRUE);
-  if($jslog_enabled) {
+  if ($jslog_enabled) {
     drupal_add_js(drupal_get_path('module', 'jslog') . '/js/jslog.js');
   }
 }
