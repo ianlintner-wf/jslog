@@ -94,7 +94,7 @@ function jslog_page_build(&$page) {
     drupal_add_js($jslog_settings, array(
         'type'        => 'inline',
         'group'       => JS_LIBRARY,
-        'weight'      => -999,
+        'weight'      => -1000,
         'every_page'  => TRUE,
         'cache'       => TRUE,
         'scope'       => 'header'
@@ -102,7 +102,7 @@ function jslog_page_build(&$page) {
     );
     drupal_add_js(drupal_get_path('module', 'jslog') . '/js/jslog.js', array(
         'group'       => JS_LIBRARY,
-        'weight'      => -1000,
+        'weight'      => -999,
         'every_page'  => TRUE,
         'cache'       => TRUE,
         'scope'       => 'header'
