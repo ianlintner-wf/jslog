@@ -91,8 +91,23 @@ function jslog_page_build(&$page) {
     $jslog_settings .= "var jslogBrowserDebugData = '" .    variable_get('jslog_browser_debug_data', FALSE) . "'; ";
 
     //send settings inline before logging kicks off
-    drupal_add_js($jslog_settings, 'inline');
-    drupal_add_js(drupal_get_path('module', 'jslog') . '/js/jslog.js');
+    drupal_add_js($jslog_settings, array(
+        'type'        => 'inline',
+        'group'       => JS_LIBRARY,
+        'weight'      => -999,
+        'every_page'  => TRUE,
+        'cache'       => TRUE,
+        'scope'       => 'header'
+      )
+    );
+    drupal_add_js(drupal_get_path('module', 'jslog') . '/js/jslog.js', array(
+        'group'       => JS_LIBRARY,
+        'weight'      => -1000,
+        'every_page'  => TRUE,
+        'cache'       => TRUE,
+        'scope'       => 'header'
+      )
+    );
   }
 }
 
