@@ -1,7 +1,9 @@
+var testUrl = casper.cli.get("url");
+
 casper.test.comment('Starting Testing');
 casper.test.begin('JSLog Test', function (test) {
 
-  casper.start('http://drupal.loc/');
+  casper.start(testUrl);
   casper.then(function() {
     var jsLogExists = casper.evaluate(function(){
       return (typeof jslog === 'object');

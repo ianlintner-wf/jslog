@@ -19,7 +19,7 @@ function jslog_permission() {
 function jslog_menu() {
   $items = array();
 
-  $items['admin/config/jslog'] = array(
+  $items['admin/config/development/jslog'] = array(
     'title'            => 'jslog module settings',
     'description'      => 'jslog module settings',
     'page callback'    => 'drupal_get_form',
@@ -48,20 +48,29 @@ function jslog_ajax_log() {
   if ($jslog_enabled) {
     $severity = $_POST['severity'];
     $message = $_POST['message'];
-    $excepton = $_POST['exception'];
+    $exception = $_POST['exception'];
+    $location = $_POST['location'];
+    $browser_debug = $_POST['browser_debug'];
     $data = $_POST['data'];
-    $paramters = array();
+    $parameters = array();
     if (!empty($severity) && !empty($message)) {
-      if (isset($excepton)) {
+      if (isset($exception)) {
         $message .= ' exception: %exception';
-        $paramters['%exception'] = print_r($excepton, TRUE);
+        $parameters['%exception'] = print_r($exception, TRUE);
       }
       if (isset($data)) {
         $message .= ' data: %data';
-        $paramters['%data'] = print_r($data, TRUE);
+        $parameters['%data'] = print_r($data, TRUE);
       }
-      watchdog($jslog_identity, $message, $paramters, $severity);
-
+      if (!empty($location)) {
+        $message .= ' location: %location';
+        $parameters['%location'] = $location;
+      }
+      if(isset($browser_debug)) {
+        $message .= ' browser debug: %browser_debug';
+        $parameters['%browser_debug'] = print_r($browser_debug,true);
+      }
+      watchdog($jslog_identity, $message, $parameters, $severity);
     }
   }
 }
@@ -75,6 +84,14 @@ function jslog_page_build(&$page) {
   //Include logger on every page
   $jslog_enabled = variable_get('jslog_enabled', TRUE);
   if ($jslog_enabled) {
+    //It is too early in the request stream for Drupal.Settings
+    $jslog_settings = "var jslogWindowOnError = '" . variable_get('jslog_window_on_error', TRUE) . "'; ";
+    $jslog_settings .= "var jslogContinue = '" . variable_get('jslog_continue', TRUE) . "'; ";
+    $jslog_settings .= "var jslogConsole = '" . variable_get('jslog_console', FALSE) . "'; ";
+    $jslog_settings .= "var jslogBrowserDebugData = '" .    variable_get('jslog_browser_debug_data', FALSE) . "'; ";
+
+    //send settings inline before logging kicks off
+    drupal_add_js($jslog_settings, 'inline');
     drupal_add_js(drupal_get_path('module', 'jslog') . '/js/jslog.js');
   }
 }

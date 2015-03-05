@@ -3,4 +3,4 @@ description = "Allows for ajax javascript logging and error handling."
 core = 7.x
 package = "Development"
 
-configure = admin/config/jslog
+configure = admin/config/development/jslog
