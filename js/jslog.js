@@ -137,7 +137,6 @@ if (jslogWindowOnError) {
     }
   };
 }
-throw('exceptional');
 
 
 
