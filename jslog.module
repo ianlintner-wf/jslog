@@ -46,33 +46,60 @@ function jslog_ajax_log() {
   $jslog_enabled = variable_get('jslog_enabled', TRUE);
   $jslog_identity = variable_get('jslog_identity', 'jslog');
   if ($jslog_enabled) {
-    $severity = $_POST['severity'];
-    $message = $_POST['message'];
-    $exception = $_POST['exception'];
-    $location = $_POST['location'];
-    $browser_debug = $_POST['browser_debug'];
-    $data = $_POST['data'];
-    $parameters = array();
-    if (!empty($severity) && !empty($message)) {
-      if (isset($exception)) {
-        $message .= ' exception: %exception';
-        $parameters['%exception'] = print_r($exception, TRUE);
-      }
-      if (isset($data)) {
-        $message .= ' data: %data';
-        $parameters['%data'] = print_r($data, TRUE);
-      }
-      if (!empty($location)) {
-        $message .= ' location: %location';
-        $parameters['%location'] = $location;
-      }
-      if(isset($browser_debug)) {
-        $message .= ' browser debug: %browser_debug';
-        $parameters['%browser_debug'] = print_r($browser_debug,true);
-      }
-      watchdog($jslog_identity, $message, $parameters, $severity);
+    $exception = NULL;
+    $location = '';
+    $browser_debug = NULL;
+    $data = NULL;
+    $severity = WATCHDOG_INFO;
+    $message = '';
+
+    //If no message exists end the call.
+    if (array_key_exists('message', $_POST)) {
+      $message = $_POST['message'];
     }
+    else {
+      watchdog('jslog', 'NO MESSAGE', array(), WATCHDOG_WARNING);
+      return;
+    }
+
+    //Avoiding warnings/notices stupid post array!
+    if (array_key_exists('severity', $_POST)) {
+      $severity = $_POST['severity'];
+    }
+    if (array_key_exists('exception', $_POST)) {
+      $exception = $_POST['exception'];
+    }
+    if (array_key_exists('location', $_POST)) {
+      $location = $_POST['location'];
+    }
+    if (array_key_exists('browser_debug', $_POST)) {
+      $browser_debug = $_POST['browser_debug'];
+    }
+    if (array_key_exists('data', $_POST)) {
+      $data = $_POST['data'];
+    }
+
+    $parameters = array();
+
+    if (isset($exception)) {
+      $message .= ' exception: %exception';
+      $parameters['%exception'] = print_r($exception, TRUE);
+    }
+    if (isset($data)) {
+      $message .= ' data: %data';
+      $parameters['%data'] = print_r($data, TRUE);
+    }
+    if (!empty($location)) {
+      $message .= ' location: %location';
+      $parameters['%location'] = $location;
+    }
+    if (isset($browser_debug)) {
+      $message .= ' browser debug: %browser_debug';
+      $parameters['%browser_debug'] = print_r($browser_debug, TRUE);
+    }
+    watchdog($jslog_identity, $message, $parameters, $severity);
   }
+
 }
 
 /**
@@ -84,28 +111,28 @@ function jslog_page_build(&$page) {
   //Include logger on every page
   $jslog_enabled = variable_get('jslog_enabled', TRUE);
   if ($jslog_enabled) {
-    //It is too early in the request stream for Drupal.Settings
+    //It is too early in the js loading for Drupal.Settings, but this is by design
     $jslog_settings = "var jslogWindowOnError = '" . variable_get('jslog_window_on_error', TRUE) . "'; ";
     $jslog_settings .= "var jslogContinue = '" . variable_get('jslog_continue', TRUE) . "'; ";
     $jslog_settings .= "var jslogConsole = '" . variable_get('jslog_console', FALSE) . "'; ";
-    $jslog_settings .= "var jslogBrowserDebugData = '" .    variable_get('jslog_browser_debug_data', FALSE) . "'; ";
+    $jslog_settings .= "var jslogBrowserDebugData = '" . variable_get('jslog_browser_debug_data', FALSE) . "'; ";
 
     //send settings inline before logging kicks off
     drupal_add_js($jslog_settings, array(
-        'type'        => 'inline',
-        'group'       => JS_LIBRARY,
-        'weight'      => -1000,
-        'every_page'  => TRUE,
-        'cache'       => TRUE,
-        'scope'       => 'header'
+        'type'       => 'inline',
+        'group'      => JS_LIBRARY,
+        'weight'     => -1000,
+        'every_page' => TRUE,
+        'cache'      => TRUE,
+        'scope'      => 'header'
       )
     );
     drupal_add_js(drupal_get_path('module', 'jslog') . '/js/jslog.js', array(
-        'group'       => JS_LIBRARY,
-        'weight'      => -999,
-        'every_page'  => TRUE,
-        'cache'       => TRUE,
-        'scope'       => 'header'
+        'group'      => JS_LIBRARY,
+        'weight'     => -999,
+        'every_page' => TRUE,
+        'cache'      => TRUE,
+        'scope'      => 'header'
       )
     );
   }
